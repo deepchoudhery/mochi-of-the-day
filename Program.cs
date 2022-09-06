@@ -9,16 +9,6 @@ using System.Security.Authentication;
 using System.Xml.Xsl;
 
 var builder = WebApplication.CreateBuilder(args);
-/*string connectionString =
-  @"mongodb://mochiwords:qtb3ipBpOv2T277fcJUbEiPGpO6j557J8ym6kPmeJHdnN9X0qxdon8WILzdiA4GKAa0MFuGsoieFFf3s3Q5m6g==@mochiwords.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@mochiwords@";
-MongoClientSettings settings = MongoClientSettings.FromUrl(
-new MongoUrl(connectionString)
-);
-settings.SslSettings =
-  new SslSettings() { EnabledSslProtocols = SslProtocols.Tls12 };
-var mongoClient = new MongoClient(settings);
-var dbs = mongoClient.ListDatabases().ToList();
-var db = dbs.First();*/
 
 builder.Services.Configure<WordsDatabaseSettings>(builder.Configuration.GetSection(nameof(WordsDatabaseSettings)));
 builder.Services.AddSingleton<IWordsDatabaseSettings>(sp => sp.GetRequiredService<IOptions<WordsDatabaseSettings>>().Value);
