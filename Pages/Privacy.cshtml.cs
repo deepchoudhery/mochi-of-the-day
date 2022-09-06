@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace mochi_of_the_day.Pages;
+namespace MochiOfTheDay.Pages;
 
 public class PrivacyModel : PageModel
 {

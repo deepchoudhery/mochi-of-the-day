@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "mochi_of_the_day": {
+    "MochiOfTheDay": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
