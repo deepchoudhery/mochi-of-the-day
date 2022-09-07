@@ -11,11 +11,13 @@ namespace MochiOfTheDay.Models
         [BsonElement("Definition")]
         public string? Definition { get; set; }
 
-        [BsonElement("PhotoName")]
-        public string? PhotoName { get; set; }
+        [BsonElement("PartOfSpeech")]
+        public string? PartOfSpeech { get; set; }
+
+        [BsonElement("PhotoUrl")]
+        public string? PhotoUrl { get; set; }
 
         [BsonId]
-        [BsonRepresentation(BsonType.DateTime)]
-        public DateTime Date { get; set; }
+        public string? Date { get; set; }
     }
 }

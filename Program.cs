@@ -1,20 +1,11 @@
-using Azure.Storage.Blobs;
-using Microsoft.Extensions.Azure;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using MochiOfTheDay.Models;
 using MochiOfTheDay.Services;
-using MongoDB.Driver;
-using System.Security.Authentication;
-using System.Xml.Xsl;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.Configure<WordsDatabaseSettings>(builder.Configuration.GetSection(nameof(WordsDatabaseSettings)));
 builder.Services.AddSingleton<IWordsDatabaseSettings>(sp => sp.GetRequiredService<IOptions<WordsDatabaseSettings>>().Value);
-
 builder.Services.AddSingleton<WordsService>();
-
 
 // Add services to the container.
 builder.Services.AddRazorPages();

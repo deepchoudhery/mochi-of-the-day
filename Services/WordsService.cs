@@ -1,9 +1,8 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using MochiOfTheDay.Models;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Configuration;
-using System.Net;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.Json;
 
 namespace MochiOfTheDay.Services
 {
@@ -14,13 +13,12 @@ namespace MochiOfTheDay.Services
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
-
             _words = database.GetCollection<Word>(settings.WordsCollectionName);
         }
 
         public List<Word> Get() => _words.Find(Word => true).ToList();
 
-        public Word Get(DateOnly id) => _words.Find(Word => Word.Date.Equals(id)).FirstOrDefault();
+        public Word Get(string id) => _words.Find(Word => id.Equals(Word.Date)).FirstOrDefault();
 
         public Word Create(Word Word)
         {
@@ -28,32 +26,65 @@ namespace MochiOfTheDay.Services
             return Word;
         }
 
-        public void Update(DateOnly id, Word updatedWord) => _words.ReplaceOne(Word => Word.Date.Equals(id), updatedWord);
+        public void Update(string id, Word updatedWord) => _words.ReplaceOne(Word => id.Equals(Word.Date), updatedWord);
 
         public void Delete(Word WordForDeletion) => _words.DeleteOne(Word => Word.Date.Equals(WordForDeletion.Date));
 
-        public void Delete(DateOnly id) => _words.DeleteOne(Word => Word.Date.Equals(id));
+        public void Delete(string id) => _words.DeleteOne(Word => id.Equals(Word.Date));
     }
 
     public class WordOfTheDayService
     {
-        public static async Task<Word> GetWordOfTheDayAsync(string photoName)
+        public static async Task<Word> GetWordOfTheDayAsync(string photoName, string apiKey)
         {
-            string address = "http://api.wordnik.com/v4/words.json/wordOfTheDay?api_key=";
+            string address = $"http://api.wordnik.com/v4/words.json/wordOfTheDay?api_key={apiKey}";
             var client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync(address);
             response.EnsureSuccessStatusCode();
-            //result = await response.Content.ReadAsStringAsync();
+            string result = await response.Content.ReadAsStringAsync();
+            WordnikWord? randomApiWord = null;
+            if (!string.IsNullOrEmpty(result))
+            {
+                randomApiWord = JsonSerializer.Deserialize<WordnikWord>(result, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            
+            if (randomApiWord == null)
+            {
+                throw new Exception("asdfasdf");
+            }
 
-            //call api to get word of the day
             Word newWord = new()
             {
-                WordOfTheDay = "hurrdurr",
-                Definition = "hurrdurr",
-                Date = DateTime.Now,
-                PhotoName = photoName
+                WordOfTheDay = randomApiWord.Word,
+                Definition = randomApiWord.Definitions?.First().Text,
+                Date = new Tuple<int, int, int>(DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Year).ToString(),
+                PhotoUrl = photoName,
+                PartOfSpeech = randomApiWord.Definitions?.First().PartOfSpeech
             };
+
             return newWord;
+        }
+
+        public static async Task<string> GetRandomPic(BlobContainerClient blobContainer)
+        {
+            // List blobs in the container.
+            // Note this is only possible when the container supports full public read access.
+            var allPics = new List<BlobItem>();
+            await foreach (var blobItem in blobContainer.GetBlobsAsync())
+            {
+                allPics.Add(blobItem);
+            }
+            BlobItem? randomPic = null;
+            if (allPics != null && allPics.Any())
+            {
+                randomPic = allPics.ToArray()[new Random().Next(0, allPics.Count())];
+            }
+
+            if (randomPic == null)
+            {
+                return "404";
+            }
+           return randomPic?.Name ?? string.Empty;
         }
     }
 }
