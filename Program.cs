@@ -1,8 +1,12 @@
 using Microsoft.Extensions.Options;
 using MochiOfTheDay.Models;
 using MochiOfTheDay.Services;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
 builder.Services.Configure<WordsDatabaseSettings>(builder.Configuration.GetSection(nameof(WordsDatabaseSettings)));
 builder.Services.AddSingleton<IWordsDatabaseSettings>(sp => sp.GetRequiredService<IOptions<WordsDatabaseSettings>>().Value);
 builder.Services.AddSingleton<WordsService>();
