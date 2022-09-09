@@ -4,9 +4,16 @@
       "type": "storage",
       "connectionId": "mochipics"
     },
+    "compute.appService1": {
+      "group": "connections",
+      "type": "compute.appService"
+    },
     "secrets1": {
       "type": "secrets",
       "connectionId": "VaultUri"
+    },
+    "identityapp1": {
+      "type": "identityapp"
     }
   }
 }

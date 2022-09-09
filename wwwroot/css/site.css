@@ -16,3 +16,8 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.center {
+    align-content:center;
+    height: 400px;
+}
